@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script src="js/kakao.js"></script>
+
+</head>
+<body>
+    <h2>따릉이 실시간 대여현황</h2>
+    <div id="map" style="width:500px;height:400px;"></div>
+
+        <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=cf8489a48ea94608983ee93a5ae80fab&libraries=services,clusterer,drawing"></script>
+    </script>
+
+    <script>
+        var container = document.getElementById('map'); //지도를 담을 영역의 DOM 레퍼런스
+        var options = { //지도를 생성할 때 필요한 기본 옵션
+            center: new kakao.maps.LatLng(37.488611422540465, 127.14619903005418), //지도의 중심좌표.
+            level: 3 //지도의 레벨(확대, 축소 정도)
+        };
+
+        var map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
+
+
+            function getFetch() {
+                //서울시 공공 화장실 위치정보
+                // fetch("http://openAPI.seoul.go.kr:8088/68636e4f666173343539674e65677a/json/GeoInfoPublicToilet/1/1000")
+                    fetch("http://openapi.seoul.go.kr:8088/68636e4f666173343539674e65677a/json/bikeList/1/1000/")
+                    .then(function (response) {
+                        if (response.status != 200) {
+                            alert("서버상 문제가 발생했습니다.");
+                            return;
+                        } else {
+                            return response.json();
+                        }
+                    })
+                    .then(function (jsonData) {
+                        var data = jsonData.rentBikeStatus.row;
+                        // console.log(data)
+                        var imageSrc = "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png";
+                        
+                        for (var i = 0; i < data.length; i++) {
+                            X = data[i].stationLatitude;
+                            Y = data[i].stationLongitude;
+                            N = data[i].stationName;
+                            // console.log(X)                            
+                            // console.log(Y)       
+                            // console.log(N)  
+
+                            var positions = new kakao.maps.LatLng(X, Y);
+
+                            var imageSize = new kakao.maps.Size(24, 35);
+                            var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+
+                            var marker = new kakao.maps.Marker({
+                                map: map, // 마커를 표시할 지도
+                                position: positions, // 마커를 표시할 위치
+                                title: N, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
+                                image: markerImage // 마커 이미지 
+                            });
+
+                           
+
+                    }
+                   
+                })
+            }
+
+            getFetch();
+            
+    </script>
+
+</body>
+</html>
